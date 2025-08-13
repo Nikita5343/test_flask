@@ -1,0 +1,16 @@
+<!-- {% include "header.html" %}
+<p>Привет Никита</p>
+{% include "footer.html" %} -->
+
+{% extends "courses/layout.html" %}
+{% block title %}Курсы{% endblock %}
+{% block content %}
+<table>
+    {% for course in courses %}
+    <tr>
+        <td>{{course.id}}</td>
+        <td>{{course.title}}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}
