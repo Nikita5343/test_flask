@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <style>
+        .success {
+            color: green;
+        }
+        .error {
+            color: red;
+        }
+    </style>
 </head>
 <body>
     {% if messages %}
@@ -13,7 +21,7 @@
     {% endfor %}
   </ul>
 {% endif %}
-    <form action="{{ url_for('users_post') }}" method="get">
+    <form action="{{ url_for('users_post') }}" method="post">
         <input type="search" name="term" value="{{ search or ''}}" />
         <input type="submit" value="Поиск" />
       </form>

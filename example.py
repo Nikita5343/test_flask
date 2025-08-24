@@ -5,51 +5,27 @@ from markupsafe import escape
 import json
 import uuid
 from flask import Flask, redirect, render_template, request, url_for, flash, get_flashed_messages
+from dotenv import load_dotenv
+import os 
 
-
-users = json.load(open('users.json', 'r'))
 app = Flask(__name__)
 
-app.secret_key = "secret_key"
+load_dotenv()
 
-# users = [
-#     {"id": 1, "name": "mike"},
-#     {"id": 2, "name": "mishel"},
-#     {"id": 3, "name": "adel"},
-#     {"id": 4, "name": "keks"},
-#     {"id": 5, "name": "kamila"},
-# ]
+# users = json.load(open('users.json', 'r'))
+# app = Flask(__name__)
+# app.config.from_pyfile('config.py')
+
+# app.secret_key = "secret_key"
+
+app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
+app.config["DEBUG"] = os.getenv("DEBUG", "False") == "True"
+app.config["DATABASE_URL"] = os.getenv("DATABASE_URL")
 
 @app.get("/")
 def index():
     app.logger.info("Получен запрос к главной стрнице")
     return "Hello, World!"
-
-# @app.get("/users/")
-# def users_get():
-#     return "Ответ от GET /users"
-
-# @app.get("/users/")
-# def users_get():
-#     users = [
-#         {"id": 1, "name": "mike"},
-#         {"id": 2, "name": "mishel"},
-#         {"id": 3, "name": "adel"},
-#         {"id": 4, "name": "keks"},
-#         {"id": 5, "name": "kamila"},
-#     ]
-#     query = request.args.get('query').lower()
-#     if query:
-#         users = [
-#             user for user in users if query in user['name'].lower()
-#         ]
-#     else:
-#         users=users
-#     return render_template(
-#         'users.html',
-#         users=users,
-#         search=query,
-#     )
 
 @app.get("/users/")
 def users_get():
@@ -127,8 +103,8 @@ def get_hello():
 def get_course(id):
     return f"Курс с id {id}"
 
-@app.route('/users/<id>')
-def show_user(id):
+@app.route('/users/<id>', endpoint='show2')
+def users_show(id):
     user = {
         "id": id,
         "name": f"user-{id}"
@@ -138,7 +114,7 @@ def show_user(id):
         user=user,
     )
 
-@app.route('/users/<string:nickname>/<int:id>')
+@app.route('/users/<string:nickname>/<int:id>', endpoint='show')
 def users_show(nickname, id):
     return render_template(
         "show2.html",
@@ -159,59 +135,6 @@ def courses():
 
 subs = ['math', 'physics', 'chemistry']
 
-
-
-# cities = [
-#     {'id': 1, 'city': 'Москва'},
-#     {'id': 2, 'city': 'Санкт-Петербург'},
-#     {'id': 3, 'city': 'Новосибирск'},
-#     {'id': 5, 'city': 'Красноярск'},
-#     {'id': 7, 'city': 'Екатеринбург'},
-# ]
-
-# cars = [
-#     {'model': 'BMW', 'price': 100000},
-#     {'model': 'Audi', 'price': 150000},
-#     {'model': 'Ford', 'price': 120000},
-#     {'model': 'Mercedes', 'price': 200000}
-# ]
-
-# link = '''
-# <select name="cities">
-# {% for c in cities -%}
-# {% if c['id'] > 6 -%}
-# <option value="{{c['id']}}">{{c['city']}}</option>
-# {% elif c['city'] == 'Москва' -%}
-# <option>{{c['city']}} сработало?</option>
-# {% else -%}
-# {{c['city']}}
-# {% endif -%}
-# {% endfor -%}
-# </select>
-# '''
-# persons = [
-#     {'name': 'Иван', 'age': 20, 'weight': 70},
-#     {'name': 'Петр', 'age': 30, 'weight': 80},
-#     {'name': 'Nikita', 'age': 31, 'weight': 67}
-# ]
-
-# html = '''
-# {% macro list_users(list_of_users) -%}
-# <ul>
-# {% for u in list_of_users -%}
-# <li>{{u.name}} {{caller(u)}}
-# {% endfor -%}
-# </ul>
-# {% endmacro %}
-
-# {% call(user) list_users(users) -%}
-# <ul>
-# <li>age:{{user.age}}
-# <li>weight:{{user.weight}}
-# </ul>
-# {% endcall %}
-# '''
-
 subs2 = '''
 {% for l in list_tables %}
 <ul>
@@ -231,3 +154,6 @@ def validate(user):
     if not user['email']:
         errors['email'] = "Can't be blank"
     return errors
+
+if __name__ == "__main__":
+    app.run(debug=True, port=8000)
